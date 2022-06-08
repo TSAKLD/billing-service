@@ -20,8 +20,8 @@ func NewServer(serv *service.UserService, p string) *Server {
 	r.HandleFunc("/users/balance", hand.UserBalance).Methods(http.MethodGet)
 	r.HandleFunc("/users/balance", hand.ChangeUserBalance).Methods(http.MethodPatch)
 	r.HandleFunc("/users/balance-transfer", hand.TransferMoney).Methods(http.MethodPatch)
-	//r.HandleFunc("/users/transfer-balance", hand.TransferMoney).Methods(http.MethodPatch)
 	r.HandleFunc("/users/currency-balance", hand.BalanceInCurrency).Methods(http.MethodGet)
+	r.HandleFunc("/users/transactions", hand.TransactionList).Methods(http.MethodGet)
 
 	return &Server{
 		port:   p,

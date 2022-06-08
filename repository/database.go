@@ -140,3 +140,40 @@ func (r *Repository) TransferTransaction(tr entity.Transaction) error {
 
 	return nil
 }
+
+func (r *Repository) TransactionList(p entity.Parameters) ([]entity.Transaction, error) {
+	var args []interface{}
+	args = make([]interface{}, 0, 3)
+
+	q := "select user_id, sender_id, retriever_id, amount, system_commentary, user_commentary, date " +
+		"from transactions"
+
+	if p.UserID != nil {
+		args = append(args, *p.UserID)
+		q = q + fmt.Sprintf(" where user_id = $%v", len(args))
+	}
+
+	q = q + fmt.Sprintf(" order by date offset $%v limit $%v", len(args)+1, len(args)+2)
+
+	args = append(args, *p.Offset)
+	args = append(args, *p.Limit)
+
+	rows, err := r.db.Query(q, args...)
+	if err != nil {
+		return []entity.Transaction{}, err
+	}
+
+	var result []entity.Transaction
+	var t entity.Transaction
+
+	for rows.Next() {
+		err := rows.Scan(&t.UserID, &t.Sender, &t.Retriever, &t.Amount, &t.SystemCommentary, &t.UserCommentary, &t.Date)
+		if err != nil {
+			return []entity.Transaction{}, err
+		}
+
+		result = append(result, t)
+	}
+
+	return result, nil
+}

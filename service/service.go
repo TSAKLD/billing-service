@@ -85,3 +85,12 @@ func (us *UserService) TransferMoney(tr entity.Transaction) error {
 
 	return nil
 }
+
+func (us *UserService) TransactionList(p entity.Parameters) ([]entity.Transaction, error) {
+	result, err := us.repo.TransactionList(p)
+	if err != nil {
+		return []entity.Transaction{}, err
+	}
+
+	return result, nil
+}

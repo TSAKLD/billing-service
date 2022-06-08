@@ -149,3 +149,51 @@ func (hdr Handler) BalanceInCurrency(w http.ResponseWriter, r *http.Request) {
 
 	json.NewEncoder(w).Encode(result)
 }
+
+func (hdr Handler) TransactionList(w http.ResponseWriter, r *http.Request) {
+	p := entity.NewParameters()
+
+	v := r.URL.Query()
+
+	i := v.Get("id")
+	o := v.Get("offset")
+	l := v.Get("limit")
+
+	if i != "" {
+		id, err := strconv.Atoi(i)
+		if err != nil {
+			sendError(w, err, http.StatusBadRequest)
+			return
+		}
+
+		p.UserID = &id
+	}
+
+	if o != "" {
+		offset, err := strconv.Atoi(o)
+		if err != nil {
+			sendError(w, err, http.StatusBadRequest)
+			return
+		}
+
+		p.Offset = &offset
+	}
+
+	if l != "" {
+		limit, err := strconv.Atoi(l)
+		if err != nil {
+			sendError(w, err, http.StatusBadRequest)
+			return
+		}
+
+		p.Limit = &limit
+	}
+
+	result, err := hdr.us.TransactionList(p)
+	if err != nil {
+		sendError(w, err, http.StatusInternalServerError)
+		return
+	}
+
+	json.NewEncoder(w).Encode(result)
+}
